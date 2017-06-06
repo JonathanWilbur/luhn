@@ -1,0 +1,5 @@
+*.exe
+*.obj
+*.a
+*.o
+.DS_Store
