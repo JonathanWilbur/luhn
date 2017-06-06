@@ -1,5 +1,6 @@
 module luhn;
 import std.traits : isIntegral, isUnsigned;
+import core.checkedint;
 
 //TODO: checkedInt?
 
@@ -7,28 +8,28 @@ import std.traits : isIntegral, isUnsigned;
     Returns: The Luhn Digit to append to the number.
 */
 public @safe
-T luhnDigitOf(T)(T number)
+ubyte luhnDigitOf(T)(T number)
 if (isIntegral!T && isUnsigned!T)
 {
-    T[] digits;
-    for (int exponent = 0; number > 10; exponent++)
+    ubyte[] digits;
+    for (uint exponent = 0; number > 10u; exponent++)
     {
-        digits ~= ((number / (10^^exponent)) % 10);
+        digits ~= lastDigitOf(number / (10u^^exponent));
         number = removeLastDigitFrom(number);
     }
-    T sum;
+    uint sum;
     bool doubleThisDigit = true;
-    for (T i = 0; i < digits.length; i++)
+    for (uint i = 0; i < digits.length; i++)
     {
         if (doubleThisDigit)
         {
-            digits[cast(uint) i] <<= 1; // Shifting by 1 is faster than multiplication by 2.
-            if (digits[cast(uint) i] > 9) digits[cast(uint) i] -= 9;
+            digits[i] <<= 1; // Shifting by 1 is faster than multiplication by 2.
+            if (digits[i] > 9u) digits[i] -= 9u;
         }
-        sum += digits[cast(uint) i];
+        sum += digits[i];
         doubleThisDigit = !doubleThisDigit;
     }
-    return ((sum * 9) % 10);
+    return lastDigitOf(sum * 9u);
 }
 
 ///
@@ -38,7 +39,6 @@ unittest
     assert(luhnDigitOf(7992739871u) == 3u);
 }
 
-//TODO: Inline
 /**
     Returns: The number with the digit appended.
 */
@@ -47,7 +47,11 @@ public @safe
 T appendDigitTo(T, U)(T number, U digit)
 if (isIntegral!T && isIntegral!U && isUnsigned!T && isUnsigned!U)
 {
-    return ((number * 10) + digit);
+    bool arithmeticOverflow = false;
+    number = mulu(number, 10u, arithmeticOverflow);
+    number = addu(number, digit, arithmeticOverflow);
+    //REVIEW: Should I really just return 0u for an overflow, or throw?
+    return (arithmeticOverflow ? 0u : number);
 }
 
 ///
@@ -82,10 +86,10 @@ unittest
 */
 pragma(inline, true)
 public @safe
-T lastDigitOf(T)(T number)
+ubyte lastDigitOf(T)(T number)
 if (isIntegral!T && isUnsigned!T)
 {
-    return (number % 10);
+    return cast(ubyte) (number % 10u);
 }
 
 ///
@@ -103,7 +107,7 @@ public @safe
 T removeLastDigitFrom(T)(T number)
 if (isIntegral!T && isUnsigned!T)
 {
-    return ((number - lastDigitOf(number)) / 10);
+    return ((number - lastDigitOf(number)) / 10u);
 }
 
 ///
