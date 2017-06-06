@@ -1,6 +1,5 @@
 module luhn;
 import std.traits : isIntegral, isUnsigned;
-// import std.math : log10, ceil, abs;
 
 // debug
 // {
@@ -8,18 +7,6 @@ import std.traits : isIntegral, isUnsigned;
 // }
 
 //TODO: checkedInt?
-
-/**
-    Returns: true if the Luhn checksum is valid.
-*/
-public
-bool luhnChecksumIsValidFor(T)(T number)
-if (isIntegral!T && isUnsigned!T)
-{
-    T luhnDigit = (number % 10);
-    T verifand = ((number - luhnDigit) / 10); // 'Verifand' should be considered a real word, IMO.
-    return (luhnDigitOf(verifand) == luhnDigit ? true : false); //REVIEW: "? true : false" is unnecessary
-}
 
 /**
     Returns: The Luhn Digit to append to the number.
@@ -54,7 +41,7 @@ if (isIntegral!T && isUnsigned!T)
     Returns: The number with the digit appended.
 */
 public
-T appendDigit(T, U)(T number, U digit)
+T appendDigitTo(T, U)(T number, U digit)
 if (isIntegral!T && isIntegral!U && isUnsigned!T && isUnsigned!U)
 {
     return ((number * 10) + digit);
@@ -64,10 +51,10 @@ if (isIntegral!T && isIntegral!U && isUnsigned!T && isUnsigned!U)
     Returns: The number with the Luhn Checksum Digit appended.
 */
 public
-T appendLuhnDigit(T)(T number)
+T appendLuhnDigitTo(T)(T number)
 if (isIntegral!T && isUnsigned!T)
 {
-    return ((number * 10) + luhnDigitOf(number));
+    return number.appendDigitTo(luhnDigitOf(number));
 }
 
 /**
@@ -83,24 +70,21 @@ if (isIntegral!T && isUnsigned!T)
 /**
     Returns: The number, but with the last digit removed.
 */
-T removeLastDigit(T)(T number)
+T removeLastDigitFrom(T)(T number)
 if (isIntegral!T && isUnsigned!T)
 {
-    return ((number - (number % 10)) / 10);
+    return ((number - lastDigitOf(number)) / 10);
 }
 
-/*
-    Functions:
-        Creation:
-            luhnDigitOf(number)
-            appendDigit(number, lastDigit)
-            appendLuhnDigit(number)
-        Verification:
-            lastDigitOf(number)
-            removeLastDigit(number)
-            removeLuhnDigit(number)
-
+/**
+    Returns: true if the Luhn checksum is valid.
 */
+public
+bool luhnDigitIsValidFor(T)(T number)
+if (isIntegral!T && isUnsigned!T)
+{
+    return (luhnDigitOf(removeLastDigitFrom(number)) == lastDigitOf(number));
+}
 
 // TODO: sum(T[])(T[] values ...) if (T.isIntegral)
 // TODO: product(T[])(T[] values ...) if (T.isIntegral)
