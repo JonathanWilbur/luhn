@@ -1,17 +1,12 @@
 module luhn;
 import std.traits : isIntegral, isUnsigned;
 
-// debug
-// {
-//     import std.stdio : writeln, writefln;
-// }
-
 //TODO: checkedInt?
 
 /**
     Returns: The Luhn Digit to append to the number.
 */
-public
+public @safe
 T luhnDigitOf(T)(T number)
 if (isIntegral!T && isUnsigned!T)
 {
@@ -36,56 +31,98 @@ if (isIntegral!T && isUnsigned!T)
     return ((sum * 9) % 10);
 }
 
+///
+@safe
+unittest
+{
+    assert(luhnDigitOf(7992739871u) == 3u);
+}
+
 //TODO: Inline
 /**
     Returns: The number with the digit appended.
 */
-public
+public @safe
 T appendDigitTo(T, U)(T number, U digit)
 if (isIntegral!T && isIntegral!U && isUnsigned!T && isUnsigned!U)
 {
     return ((number * 10) + digit);
 }
 
+///
+@safe
+unittest
+{
+    assert(appendDigitTo(7992739871u, 3u) == 79927398713u);
+    assert(appendDigitTo(7992739871u, 0u) == 79927398710u);
+    assert(appendDigitTo(7992739871u, 9u) == 79927398719u);
+}
+
 /**
     Returns: The number with the Luhn Checksum Digit appended.
 */
-public
+public @safe
 T appendLuhnDigitTo(T)(T number)
 if (isIntegral!T && isUnsigned!T)
 {
     return number.appendDigitTo(luhnDigitOf(number));
 }
 
+///
+@safe
+unittest
+{
+    assert(appendLuhnDigitTo(7992739871u) == 79927398713u);
+}
+
 /**
     Returns: The last digit of the number.
 */
-public
+public @safe
 T lastDigitOf(T)(T number)
 if (isIntegral!T && isUnsigned!T)
 {
     return (number % 10);
 }
 
+///
+@safe
+unittest
+{
+    assert(lastDigitOf(79927398713u) == 3u);
+}
+
 /**
     Returns: The number, but with the last digit removed.
 */
+public @safe
 T removeLastDigitFrom(T)(T number)
 if (isIntegral!T && isUnsigned!T)
 {
     return ((number - lastDigitOf(number)) / 10);
 }
 
+///
+@safe
+unittest
+{
+    assert(lastDigitOf(79927398713u) == 3u);
+}
+
 /**
     Returns: true if the Luhn checksum is valid.
 */
-public
+public @safe
 bool luhnDigitIsValidFor(T)(T number)
 if (isIntegral!T && isUnsigned!T)
 {
     return (luhnDigitOf(removeLastDigitFrom(number)) == lastDigitOf(number));
 }
 
-// TODO: sum(T[])(T[] values ...) if (T.isIntegral)
-// TODO: product(T[])(T[] values ...) if (T.isIntegral)
-// TODO: toggle(bool value)
+///
+@safe
+unittest
+{
+    assert(luhnDigitIsValidFor(79927398713u));
+    assert(!luhnDigitIsValidFor(79927398714u));
+}
