@@ -14,7 +14,7 @@ if (isIntegral!T && isUnsigned!T)
     for (int exponent = 0; number > 10; exponent++)
     {
         digits ~= ((number / (10^^exponent)) % 10);
-        number = ((number - (number % 10)) / 10);
+        number = removeLastDigitFrom(number);
     }
     T sum;
     bool doubleThisDigit = true;
@@ -42,6 +42,7 @@ unittest
 /**
     Returns: The number with the digit appended.
 */
+pragma(inline, true)
 public @safe
 T appendDigitTo(T, U)(T number, U digit)
 if (isIntegral!T && isIntegral!U && isUnsigned!T && isUnsigned!U)
@@ -61,6 +62,7 @@ unittest
 /**
     Returns: The number with the Luhn Checksum Digit appended.
 */
+pragma(inline, true)
 public @safe
 T appendLuhnDigitTo(T)(T number)
 if (isIntegral!T && isUnsigned!T)
@@ -78,6 +80,7 @@ unittest
 /**
     Returns: The last digit of the number.
 */
+pragma(inline, true)
 public @safe
 T lastDigitOf(T)(T number)
 if (isIntegral!T && isUnsigned!T)
@@ -95,6 +98,7 @@ unittest
 /**
     Returns: The number, but with the last digit removed.
 */
+pragma(inline, true)
 public @safe
 T removeLastDigitFrom(T)(T number)
 if (isIntegral!T && isUnsigned!T)
