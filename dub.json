@@ -1,0 +1,7 @@
+{
+	"name": "luhn",
+	"description": "A Library for Luhn Checksums",
+	"authors": [ "Jonathan M. Wilbur" ],
+	"license": "BSL-1.0",
+	"targetType": "library"
+}
