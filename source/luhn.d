@@ -1,15 +1,15 @@
 /**
 	Calculates, appends, and verifies Luhn Algorithm checksum digits.
 
-	Authors: Jonathan M. Wilbur
-	Date: June 6th, 2017
+	Authors:
+        $(LINK2 mailto:jonathan@wilbur.space, Jonathan M. Wilbur)
+	Date: June 7th, 2017
 	License: $(LINK2 http://www.boost.org/LICENSE_1_0.txt, Boost License 1.0)
-	Standards: $(LINK2 https://www.ietf.org/rfc/rfc3492.txt, RFC3492)
 	Version: 1.0.0
 */
 module luhn;
+import core.checkedint : addu, mulu;
 import std.traits : isIntegral, isUnsigned;
-import core.checkedint;
 
 /*
     NOTE: I think I have accidentally discovered that you cannot inline
